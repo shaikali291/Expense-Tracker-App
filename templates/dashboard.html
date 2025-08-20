@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block content %}
+<center><h2>Welcome to the Expense Tracker App</h2></center>
+<div class="row justify-content-center text-center mt-5">
+  <div class="col-md-3">
+    <div class="card mb-3">
+      <div class="card-body">
+      <h5>Total Income</h5>
+      <h3>₹{{ total_income }}</h3>
+    </div></div>
+
+    <div class="card mb-3">
+      <div class="card-body">
+      <h5>Total Expense</h5>
+      <h3>₹{{ total_expense }}</h3>
+    </div></div>
+
+    <div class="card mb-3">
+      <div class="card-body">
+      <h5>Savings</h5>
+      <h3>₹{{ savings }}</h3>
+    </div></div>
+
+<br>
+
+  </div>
+
+    <a class="btn btn-success btn-block mb-2" href="{{ url_for('add_income') }}">Add Income</a>
+    <a class="btn btn-danger btn-block mb-2" href="{{ url_for('add_expense') }}">Add Expense</a>
+  </div>
+
+<br>
+<h5>Recent Income:</h5>
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Category</th>
+          <th>Amount</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for r in incomes %}
+        <tr>
+          <td>{{ r.date }}</td>
+          <td>{{ r.category }}</td>
+          <td>₹{{ r.amount }}</td>
+          <td>
+            <a class="btn btn-sm btn-warning" href="{{ url_for('edit_income', id=r.id) }}">Edit</a>
+            <a class="btn btn-sm btn-danger" href="{{ url_for('delete_income', id=r.id) }}">Delete</a>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+    <h5>Recent Expenses:</h5>
+    <table class="table table-sm">
+      <thead><tr><th>Date</th><th>Category</th><th>Amount</th><th>Action</th></tr></thead>
+      <tbody>
+      {% for r in expenses %}
+        <tr>
+          <td>{{ r.date }}</td>
+          <td>{{ r.category }}</td>
+          <td>₹{{ r.amount }}</td>
+          <td>
+            <a class="btn btn-sm btn-warning" href="{{ url_for('edit_expense', id=r.id) }}">Edit</a>
+            <a class="btn btn-sm btn-danger" href="{{ url_for('delete_expense', id=r.id) }}">Delete</a>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<div style="display: flex; justify-content:center; align-items:center;">
+  <div class="col-md-8">
+    <div class="card mb-3"><div class="card-body">
+      <h3>Income vs Expense</h3>
+      <canvas id="pieChart"></canvas>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+      <h3>Monthly Report</h3>
+      <canvas id="barChart"></canvas>
+    </div></div>
+</div>
+    
+
+<script>
+  
+  const pieData = {labels:['Income','Expense'], datasets:[{data:[{{ pie_income }}, {{ pie_expense }}]}]};
+  const barLabels = {{ labels|safe }};
+  const incPts = {{ income_points|safe }};
+  const expPts = {{ expense_points|safe }};
+
+  new Chart(document.getElementById('pieChart'), {type:'pie', data: pieData});
+  new Chart(document.getElementById('barChart'), {
+    type:'bar',
+    data: {
+      labels: barLabels,
+      datasets: [
+        { label: 'Income', data: incPts },
+        { label: 'Expense', data: expPts }
+      ]
+    },
+    options: { scales: { y: { beginAtZero:true } } }
+  });
+</script>
+{% endblock %}
